@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Component } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
@@ -13,6 +14,24 @@ import ProfilePage from './pages/ProfilePage'
 import SettingsPage from './pages/SettingsPage'
 import AuthCallbackPage from './pages/AuthCallbackPage'
 import InvitePage from './pages/InvitePage'
+
+class ErrorBoundary extends Component {
+  state = { error: null }
+  static getDerivedStateFromError(error) { return { error } }
+  render() {
+    if (this.state.error) return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: 'var(--bg)' }}>
+        <div className="text-center max-w-sm">
+          <div className="w-10 h-10 rounded-lg mx-auto mb-4 flex items-center justify-center text-white font-bold" style={{ background: 'var(--accent)' }}>T</div>
+          <h2 className="text-base font-semibold mb-2">Something went wrong</h2>
+          <p className="text-sm mb-4" style={{ color: 'var(--text-2)' }}>{this.state.error?.message}</p>
+          <button className="btn-primary" onClick={() => window.location.reload()}>Reload</button>
+        </div>
+      </div>
+    )
+    return this.props.children
+  }
+}
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -56,6 +75,7 @@ function AppRoutes() {
 
 export default function App() {
   return (
+    <ErrorBoundary>
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
@@ -75,5 +95,6 @@ export default function App() {
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
+    </ErrorBoundary>
   )
 }

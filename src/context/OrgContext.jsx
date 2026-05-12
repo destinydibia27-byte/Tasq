@@ -33,7 +33,9 @@ export function OrgProvider({ children }) {
       .eq('status', 'active')
     
     if (data) {
-      const orgsData = data.map(d => ({ ...d.organizations, myRole: d.role }))
+      const orgsData = data
+        .filter(d => d.organizations?.id)
+        .map(d => ({ ...d.organizations, myRole: d.role }))
       setOrgs(orgsData)
       const lastId = localStorage.getItem('teamer-last-org')
       const last = orgsData.find(o => o.id === lastId)

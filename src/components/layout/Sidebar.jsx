@@ -59,7 +59,7 @@ export function Sidebar() {
                 onClick={() => { setCurrentOrg(org); setOrgDropdown(false) }}
               >
                 <div className="w-5 h-5 rounded text-white text-xs font-bold flex items-center justify-center" style={{ background: 'var(--accent)', minWidth: 20 }}>
-                  {org.name[0]}
+                  {org.name?.[0] ?? '?'}
                 </div>
                 {org.name}
               </button>
