@@ -9,16 +9,11 @@ export default function AuthCallbackPage() {
     // Supabase v2 PKCE: code exchange is async — listen for SIGNED_IN rather than
     // calling getSession() immediately (which returns null before exchange completes).
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      if (session) {
         navigate('/dashboard', { replace: true })
       } else if (event === 'SIGNED_OUT') {
         navigate('/', { replace: true })
       }
-    })
-
-    // Fallback: if a session already exists (e.g. page refresh), redirect immediately.
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) navigate('/dashboard', { replace: true })
     })
 
     return () => subscription.unsubscribe()
