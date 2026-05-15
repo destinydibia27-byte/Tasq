@@ -5,7 +5,7 @@ import { useAuth } from './AuthContext'
 const OrgContext = createContext({})
 
 export function OrgProvider({ children }) {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [orgs, setOrgs] = useState([])
   const [currentOrg, setCurrentOrg] = useState(null)
   const [members, setMembers] = useState([])
@@ -165,6 +165,16 @@ export function OrgProvider({ children }) {
         link: `/invite?token=${data.invite_token}`,
       })
     }
+
+    // Send invite email (non-blocking — don't fail invite if email fails)
+    supabase.functions.invoke('send-invite-email', {
+      body: {
+        email,
+        orgName: currentOrg.name,
+        inviterName: profile?.full_name || 'Someone',
+        inviteToken: data.invite_token,
+      },
+    }).catch(() => {})
 
     await fetchMembers(currentOrg.id)
     return { data, userExists: !!existingProfile }

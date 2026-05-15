@@ -57,7 +57,7 @@ export function AuthProvider({ children }) {
   async function checkPendingInvites(email) {
     const { data } = await supabase
       .from('org_members')
-      .select('id, invite_token, org_id, organizations(name)')
+      .select('id, invite_token, org_id, invited_by, organizations(name), inviter:profiles!invited_by(full_name, avatar_url)')
       .eq('email', email)
       .eq('status', 'invited')
     setPendingInvites(data || [])
