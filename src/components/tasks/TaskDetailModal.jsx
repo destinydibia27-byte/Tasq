@@ -7,7 +7,7 @@ import { useAuth } from '../../context/AuthContext'
 import { useOrg } from '../../context/OrgContext'
 import { submissionTypeForSkill, formatDeadline, PRIORITY_CONFIG } from '../../lib/utils'
 import { format } from 'date-fns'
-import { Paperclip, MessageSquare, CheckCircle, XCircle, Upload, Send } from 'lucide-react'
+import { Paperclip, MessageSquare, CheckCircle, XCircle, Upload, Send, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export function TaskDetailModal({ task, open, onClose, onUpdate }) {
@@ -142,6 +142,33 @@ export function TaskDetailModal({ task, open, onClose, onUpdate }) {
     onUpdate()
   }
 
+  async function clearSubmission() {
+    if (!confirm('Clear your submission? This removes all uploaded files and notes.')) return
+    setLoading(true)
+    // Delete attachments from storage + DB
+    if (attachments.length > 0) {
+      const paths = attachments.map(a => a.storage_path)
+      await supabase.storage.from('task-attachments').remove(paths)
+      await supabase.from('task_attachments').delete().eq('task_id', task.id)
+      setAttachments([])
+    }
+    await supabase.from('tasks').update({
+      submission_url: null,
+      submission_note: null,
+    }).eq('id', task.id)
+    setSubmissionUrl('')
+    setSubmissionNote('')
+    setLoading(false)
+    toast.success('Submission cleared')
+    onUpdate()
+  }
+
+  async function deleteAttachment(attachment) {
+    await supabase.storage.from('task-attachments').remove([attachment.storage_path])
+    await supabase.from('task_attachments').delete().eq('id', attachment.id)
+    setAttachments(prev => prev.filter(a => a.id !== attachment.id))
+  }
+
   async function handleFileUpload(e) {
     const file = e.target.files[0]
     if (!file) return
@@ -235,7 +262,14 @@ export function TaskDetailModal({ task, open, onClose, onUpdate }) {
         {/* Submission area */}
         {(canSubmit || task.submission_url || task.submission_note || attachments.length > 0) && (
           <div className="rounded-lg p-4 space-y-3" style={{ background: 'var(--surface-2)' }}>
-            <p className="text-sm font-medium flex items-center gap-1.5"><i className={subType.icon} style={{ fontSize: 14 }} /> {subType.label}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium flex items-center gap-1.5"><i className={subType.icon} style={{ fontSize: 14 }} /> {subType.label}</p>
+              {canSubmit && (task.submission_url || task.submission_note || attachments.length > 0) && (
+                <button className="text-xs flex items-center gap-1" style={{ color: '#ef4444' }} onClick={clearSubmission} disabled={loading}>
+                  <Trash2 size={12} /> Clear submission
+                </button>
+              )}
+            </div>
 
             {(subType.type === 'github' || subType.type === 'mixed') && (
               <input
@@ -258,11 +292,18 @@ export function TaskDetailModal({ task, open, onClose, onUpdate }) {
             {attachments.length > 0 && (
               <div className="space-y-1">
                 {attachments.map(a => (
-                  <a key={a.id} href={a.public_url} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-xs hover:opacity-80 transition-opacity"
-                    style={{ color: 'var(--accent)' }}>
-                    <Paperclip size={12} /> {a.file_name}
-                  </a>
+                  <div key={a.id} className="flex items-center gap-2">
+                    <a href={a.public_url} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs flex-1 min-w-0 hover:opacity-80 transition-opacity truncate"
+                      style={{ color: 'var(--accent)' }}>
+                      <Paperclip size={12} style={{ flexShrink: 0 }} /> {a.file_name}
+                    </a>
+                    {canSubmit && (
+                      <button onClick={() => deleteAttachment(a)} style={{ color: '#ef4444', flexShrink: 0 }}>
+                        <Trash2 size={12} />
+                      </button>
+                    )}
+                  </div>
                 ))}
               </div>
             )}

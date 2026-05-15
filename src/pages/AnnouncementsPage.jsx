@@ -11,7 +11,7 @@ import { format, formatDistanceToNow } from 'date-fns'
 
 export default function AnnouncementsPage() {
   const { user, profile } = useAuth()
-  const { currentOrg, isAdmin, members } = useOrg()
+  const { currentOrg, isAdmin, members, loading: orgLoading } = useOrg()
   const [announcements, setAnnouncements] = useState([])
   const [createOpen, setCreateOpen] = useState(false)
   const [title, setTitle] = useState('')
@@ -79,6 +79,7 @@ export default function AnnouncementsPage() {
     toast.success('Deleted')
   }
 
+  if (orgLoading) return null
   if (!currentOrg) return <EmptyState icon="fi fi-br-megaphone" title="No workspace" description="Create a workspace first." />
 
   return (

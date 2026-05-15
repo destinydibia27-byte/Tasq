@@ -12,7 +12,7 @@ const STATUSES = ['all', 'assigned', 'in_progress', 'submitted', 'approved', 're
 
 export default function TasksPage() {
   const { profile } = useAuth()
-  const { currentOrg, isAdmin, members } = useOrg()
+  const { currentOrg, isAdmin, members, loading: orgLoading } = useOrg()
   const [tasks, setTasks] = useState([])
   const [selectedTask, setSelectedTask] = useState(null)
   const [createOpen, setCreateOpen] = useState(false)
@@ -64,6 +64,7 @@ export default function TasksPage() {
 
   const activeMembers = members.filter(m => m.status === 'active' && m.user_id)
 
+  if (orgLoading) return null
   if (!currentOrg) return (
     <EmptyState icon="fi fi-br-clipboard-list" title="No workspace" description="Create a workspace first to manage tasks." />
   )

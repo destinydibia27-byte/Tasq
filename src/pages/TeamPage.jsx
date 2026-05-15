@@ -9,7 +9,7 @@ import toast from 'react-hot-toast'
 import { format } from 'date-fns'
 
 export default function TeamPage() {
-  const { currentOrg, members, isAdmin, inviteMember, shareOwnership, removeMember, revokeInvite, updateMemberSkill, myRole } = useOrg()
+  const { currentOrg, members, isAdmin, inviteMember, shareOwnership, removeMember, revokeInvite, updateMemberSkill, myRole, loading: orgLoading } = useOrg()
   const { user } = useAuth()
   const [inviteEmail, setInviteEmail] = useState('')
   const [loading, setLoading] = useState(false)
@@ -78,6 +78,7 @@ export default function TeamPage() {
     toast.success('Role updated')
   }
 
+  if (orgLoading) return null
   if (!currentOrg) return <EmptyState icon="fi fi-br-users" title="No workspace" description="Create a workspace to manage your team." />
 
   const active = members.filter(m => m.status === 'active')

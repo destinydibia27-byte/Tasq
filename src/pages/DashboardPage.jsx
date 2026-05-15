@@ -13,7 +13,7 @@ import { Plus, TrendingUp } from 'lucide-react'
 
 export default function DashboardPage() {
   const { profile } = useAuth()
-  const { currentOrg, members, isAdmin } = useOrg()
+  const { currentOrg, members, isAdmin, loading: orgLoading } = useOrg()
   const [tasks, setTasks] = useState([])
   const [announcements, setAnnouncements] = useState([])
   const [selectedTask, setSelectedTask] = useState(null)
@@ -36,6 +36,7 @@ export default function DashboardPage() {
     setLoading(false)
   }
 
+  if (orgLoading) return null
   if (!currentOrg) return (
     <div>
       <EmptyState

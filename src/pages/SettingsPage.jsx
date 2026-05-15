@@ -7,7 +7,7 @@ import { Save, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function SettingsPage() {
-  const { currentOrg, isAdmin, myRole, refetch, deleteOrg } = useOrg()
+  const { currentOrg, isAdmin, myRole, refetch, deleteOrg, loading: orgLoading } = useOrg()
   const navigate = useNavigate()
   const [name, setName] = useState(currentOrg?.name || '')
   const [description, setDescription] = useState(currentOrg?.description || '')
@@ -15,6 +15,7 @@ export default function SettingsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [deleting, setDeleting] = useState(false)
 
+  if (orgLoading) return null
   if (!currentOrg || !isAdmin) return (
     <EmptyState icon="fi fi-br-settings" title="No access" description="You need admin access to view settings." />
   )
