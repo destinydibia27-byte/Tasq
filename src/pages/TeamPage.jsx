@@ -1,16 +1,18 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useOrg } from '../context/OrgContext'
 import { useAuth } from '../context/AuthContext'
 import { Avatar } from '../components/ui/Avatar'
 import { EmptyState } from '../components/ui/EmptyState'
 import { getSkill, SKILLS } from '../lib/utils'
-import { UserPlus, Shield, Trash2, Clock, Copy, Check, ChevronDown } from 'lucide-react'
+import { UserPlus, Shield, Trash2, Clock, Copy, Check, ChevronDown, LogOut } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { format } from 'date-fns'
 
 export default function TeamPage() {
-  const { currentOrg, members, isAdmin, inviteMember, shareOwnership, removeMember, revokeInvite, updateMemberSkill, myRole, loading: orgLoading } = useOrg()
+  const { currentOrg, members, isAdmin, inviteMember, shareOwnership, removeMember, revokeInvite, updateMemberSkill, leaveOrg, myRole, loading: orgLoading } = useOrg()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [inviteEmail, setInviteEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [copiedId, setCopiedId] = useState(null)
@@ -78,6 +80,14 @@ export default function TeamPage() {
     toast.success('Role updated')
   }
 
+  async function handleLeave() {
+    if (!confirm(`Leave ${currentOrg.name}? You will lose access and need a new invite to rejoin.`)) return
+    const { error } = await leaveOrg()
+    if (error) return toast.error(error.message || 'Failed to leave workspace')
+    toast.success(`You've left ${currentOrg.name}`)
+    navigate('/dashboard')
+  }
+
   if (orgLoading) return null
   if (!currentOrg) return <EmptyState icon="fi fi-br-users" title="No workspace" description="Create a workspace to manage your team." />
 
@@ -86,9 +96,20 @@ export default function TeamPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h1 className="section-title text-xl">Team</h1>
-        <p className="text-sm" style={{ color: 'var(--text-2)' }}>{active.length} active member{active.length !== 1 ? 's' : ''} · {invited.length} pending invite{invited.length !== 1 ? 's' : ''}</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="section-title text-xl">Team</h1>
+          <p className="text-sm" style={{ color: 'var(--text-2)' }}>{active.length} active member{active.length !== 1 ? 's' : ''} · {invited.length} pending invite{invited.length !== 1 ? 's' : ''}</p>
+        </div>
+        {myRole !== 'owner' && (
+          <button
+            className="btn-outline flex items-center gap-1.5 text-sm"
+            style={{ color: '#ef4444', borderColor: '#fca5a5' }}
+            onClick={handleLeave}
+          >
+            <LogOut size={15} /> Leave workspace
+          </button>
+        )}
       </div>
 
       {/* Invite */}

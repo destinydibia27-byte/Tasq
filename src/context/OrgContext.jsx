@@ -200,6 +200,23 @@ export function OrgProvider({ children }) {
     await fetchMembers(currentOrg.id)
   }
 
+  async function leaveOrg() {
+    if (!currentOrg) return { error: 'No org selected' }
+    if (myRole === 'owner') return { error: 'Owners cannot leave. Transfer ownership first or delete the workspace.' }
+    const { error } = await supabase
+      .from('org_members')
+      .update({ status: 'removed' })
+      .eq('org_id', currentOrg.id)
+      .eq('user_id', user.id)
+    if (error) return { error }
+    localStorage.removeItem('teamer-last-org')
+    setCurrentOrg(null)
+    setMembers([])
+    setMyRole(null)
+    await fetchOrgs()
+    return {}
+  }
+
   async function deleteOrg() {
     if (!currentOrg) return { error: 'No org selected' }
     const { error } = await supabase.from('organizations').delete().eq('id', currentOrg.id)
@@ -217,7 +234,7 @@ export function OrgProvider({ children }) {
   return (
     <OrgContext.Provider value={{
       orgs, currentOrg, setCurrentOrg, members, loading, myRole, isAdmin,
-      createOrg, inviteMember, shareOwnership, removeMember, deleteOrg,
+      createOrg, inviteMember, shareOwnership, removeMember, deleteOrg, leaveOrg,
       refetch: (selectOrgId) => fetchOrgs(selectOrgId),
       refetchMembers: () => currentOrg && fetchMembers(currentOrg.id),
       revokeInvite, updateMemberSkill,
