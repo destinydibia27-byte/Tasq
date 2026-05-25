@@ -87,19 +87,8 @@ export function OrgProvider({ children }) {
   async function createOrg(name, description) {
     const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + Date.now().toString(36)
     const { data: org, error } = await supabase
-      .from('organizations')
-      .insert({ name, slug, description, owner_id: user.id })
-      .select()
-      .single()
+      .rpc('create_organization', { p_name: name, p_slug: slug, p_description: description || '' })
     if (error) return { error }
-    await supabase.from('org_members').insert({
-      org_id: org.id,
-      user_id: user.id,
-      email: user.email,
-      role: 'owner',
-      status: 'active',
-      joined_at: new Date().toISOString()
-    })
     await fetchOrgs(org.id)
     return { data: org }
   }
