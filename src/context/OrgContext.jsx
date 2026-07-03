@@ -128,6 +128,18 @@ export function OrgProvider({ children }) {
           link: `/invite?token=${updated.invite_token}`,
         })
       }
+     
+    // Send invite email (non-blocking – don't fail invite if email fails)
+    supabase.functions.invoke('send-invite-email', {
+      body: {
+        email,
+        orgName: currentOrg.name,
+        inviterName: profile?.full_name || 'Someone',
+        inviteToken: updated.invite_token,
+      },
+    }).then(res => console.log('invite email result:', res))
+  .catch(err => console.error('invite email error:', err))
+
       await fetchMembers(currentOrg.id)
       return { data: updated, userExists: !!existingProfile }
     }

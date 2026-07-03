@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Bell, Building2, Trash2 } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../context/AuthContext'
@@ -10,6 +11,7 @@ import toast from 'react-hot-toast'
 export function NotificationBell() {
   const { user, acceptInvite, declineInvite, pendingInvites } = useAuth()
   const { refetch } = useOrg()
+  const navigate = useNavigate()
   const [notifications, setNotifications] = useState([])
   const [open, setOpen] = useState(false)
   const [accepting, setAccepting] = useState(null)
@@ -93,7 +95,6 @@ export function NotificationBell() {
 
       {open && (
         <div className="absolute right-0 top-11 w-84 card shadow-xl z-50 animate-slide-up overflow-hidden" style={{ width: 340 }}>
-          {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
             <span className="text-sm font-medium">Notifications</span>
             <div className="flex items-center gap-3">
@@ -111,7 +112,6 @@ export function NotificationBell() {
           </div>
 
           <div className="max-h-96 overflow-y-auto">
-            {/* Pending invites */}
             {pendingInvites.map(invite => (
               <div key={invite.id} className="px-4 py-3 border-b" style={{ borderColor: 'var(--border)', background: 'var(--accent-light)' }}>
                 <div className="flex items-start gap-2.5">
@@ -152,14 +152,14 @@ export function NotificationBell() {
               </div>
             ))}
 
-            {/* Regular notifications */}
             {isEmpty ? (
               <p className="text-sm text-center py-10" style={{ color: 'var(--text-3)' }}>No notifications</p>
             ) : notifications.map(n => (
               <div
                 key={n.id}
                 className="px-4 py-3 border-b last:border-0"
-                style={{ borderColor: 'var(--border)', background: n.read ? 'transparent' : 'var(--accent-light)' }}
+                style={{ borderColor: 'var(--border)', background: n.read ? 'transparent' : 'var(--accent-light)', cursor: n.link ? 'pointer' : 'default' }}
+                onClick={() => { if (n.link) { setOpen(false); navigate(n.link) } }}
               >
                 <p className="text-sm font-medium leading-snug">{n.title}</p>
                 {n.body && <p className="text-xs mt-0.5 line-clamp-2" style={{ color: 'var(--text-2)' }}>{n.body}</p>}
