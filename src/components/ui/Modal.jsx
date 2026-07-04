@@ -31,5 +31,8 @@ export function Modal({ open, onClose, title, children, size = 'md' }) {
       <X size={18} />
     </button>
   </div>
-  <div className="p-5 overflow-y-auto">{children}</div>
-</div>
+      <div className="p-5 overflow-y-auto">{children}</div>
+    </div>
+  </div>
+)
+}
