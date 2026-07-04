@@ -36,7 +36,7 @@ export default function TeamPage() {
     } else if (userExists) {
       toast.success(`Invite sent! ${inviteEmail} will see it in their notifications.`)
     } else {
-      toast(`${inviteEmail} isn't on Teamer yet — link copied! Send it to them to sign up and join.`, { icon: '🔗', duration: 8000 })
+      toast(`${inviteEmail} isn't on Tasq yet — link copied! Send it to them to sign up and join.`, { icon: '🔗', duration: 8000 })
     }
     setInviteEmail('')
   }
@@ -131,7 +131,7 @@ export default function TeamPage() {
             </button>
           </div>
           <p className="text-xs mt-2" style={{ color: 'var(--text-3)' }}>
-            If they're already on Teamer they'll get a notification. If not, an invite link is copied — send it to them.
+            If they're already on Tasq they'll get a notification. If not, an invite link is copied — send it to them.
           </p>
         </div>
       )}
@@ -224,7 +224,7 @@ export default function TeamPage() {
                 <p className="text-sm truncate">{m.email}</p>
                 <p className="text-xs" style={{ color: 'var(--text-3)' }}>
                   Invited {format(new Date(m.created_at), 'MMM d, yyyy')}
-                  {!m.user_id && <span className="ml-1" style={{ color: '#f59e0b' }}>· not on Teamer yet</span>}
+                  {!m.user_id && <span className="ml-1" style={{ color: '#f59e0b' }}>· not on Tasq yet</span>}
                 </p>
               </div>
               <div className="flex items-center gap-2">

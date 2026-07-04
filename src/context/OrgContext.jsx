@@ -124,7 +124,7 @@ export function OrgProvider({ children }) {
           user_id: existingProfile.id,
           type: 'workspace_invite',
           title: `You've been invited to ${currentOrg.name}`,
-          body: `Accept the invite to join ${currentOrg.name} on Teamer.`,
+          body: `Accept the invite to join ${currentOrg.name} on Tasq.`,
           link: `/invite?token=${updated.invite_token}`,
         })
       }
@@ -162,7 +162,7 @@ export function OrgProvider({ children }) {
         user_id: existingProfile.id,
         type: 'workspace_invite',
         title: `You've been invited to ${currentOrg.name}`,
-        body: `Accept the invite to join ${currentOrg.name} on Teamer.`,
+        body: `Accept the invite to join ${currentOrg.name} on Tasq.`,
         link: `/invite?token=${data.invite_token}`,
       })
     }

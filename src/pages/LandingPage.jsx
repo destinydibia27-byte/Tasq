@@ -19,7 +19,7 @@ export default function LandingPage() {
       <header className="flex items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style={{ background: 'var(--accent)' }}>T</div>
-          <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 18 }}>Teamer</span>
+          <span style={{ fontFamily: 'Syne, sans-serif', fontWeight: 600, fontSize: 18 }}>Tasq</span>
         </div>
         <button className="btn-ghost p-2" onClick={toggle}>
           {dark ? <Sun size={18} /> : <Moon size={18} />}
@@ -84,7 +84,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="py-6 text-center text-xs" style={{ color: 'var(--text-3)' }}>
-        © {new Date().getFullYear()} Teamer — Built for async teams
+        © {new Date().getFullYear()} Tasq — Built for async teams
       </footer>
     </div>
   )

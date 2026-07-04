@@ -31,7 +31,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }) {
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-4 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
         <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-sm font-bold" style={{ background: 'var(--accent)' }}>T</div>
-        <span className="section-title text-base">Teamer</span>
+        <span className="section-title text-base">Tasq</span>
       </div>
 
       {/* Org Switcher */}

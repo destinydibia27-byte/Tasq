@@ -50,7 +50,7 @@ export default function InvitePage() {
           <>
             <h1 className="section-title text-lg mb-2">You're invited!</h1>
             <p className="text-sm mb-6" style={{ color: 'var(--text-2)' }}>
-              You've been invited to join <strong>{orgName}</strong> on Teamer.
+              You've been invited to join <strong>{orgName}</strong> on Tasq.
             </p>
             <button className="btn-primary w-full" onClick={acceptInvite}>
               {user ? `Accept & join ${orgName}` : 'Sign in to accept invite'}
