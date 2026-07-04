@@ -24,15 +24,12 @@ export function Modal({ open, onClose, title, children, size = 'md' }) {
       style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className={`card w-full ${widths[size]} animate-slide-up shadow-xl`}>
-        <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--border)' }}>
-          <h2 className="section-title text-base">{title}</h2>
-          <button className="btn-ghost p-1" onClick={onClose}>
-            <X size={18} />
-          </button>
-        </div>
-        <div className="p-5">{children}</div>
-      </div>
-    </div>
-  )
-}
+      <div className={`card w-full ${widths[size]} animate-slide-up shadow-xl flex flex-col max-h-[90vh]`}>
+  <div className="flex items-center justify-between p-5 border-b flex-shrink-0" style={{ borderColor: 'var(--border)' }}>
+    <h2 className="section-title text-base">{title}</h2>
+    <button className="btn-ghost p-1" onClick={onClose}>
+      <X size={18} />
+    </button>
+  </div>
+  <div className="p-5 overflow-y-auto">{children}</div>
+</div>
