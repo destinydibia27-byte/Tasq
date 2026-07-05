@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useOrg } from '../context/OrgContext'
 import { supabase } from '../lib/supabase'
 import { EmptyState } from '../components/ui/EmptyState'
+import { Avatar } from '../components/ui/Avatar'
 import { Save, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -14,6 +15,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [deleting, setDeleting] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef(null)
 
   if (orgLoading) return null
   if (!currentOrg || !isAdmin) return (
@@ -29,6 +32,57 @@ export default function SettingsPage() {
     await refetch()
     toast.success('Settings saved!')
   }
+  async function handleAvatarUpload(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file')
+      return
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image must be under 2MB')
+      return
+    }
+
+    setUploading(true)
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `${currentOrg.id}/avatar-${Date.now()}.${ext}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('workspace-avatars')
+        .upload(path, file, { upsert: true })
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError)
+        toast.error('Failed to upload image: ' + uploadError.message)
+        return
+      }
+
+      const { data } = supabase.storage
+        .from('workspace-avatars')
+        .getPublicUrl(path)
+
+      const { error: updateError } = await supabase
+        .from('organizations')
+        .update({ avatar_url: data.publicUrl })
+        .eq('id', currentOrg.id)
+
+      if (updateError) {
+        console.error('Update error:', updateError)
+        toast.error('Failed to save picture: ' + updateError.message)
+        return
+      }
+
+      await refetch()
+      toast.success('Workspace picture updated!')
+    } catch (err) {
+      console.error('Unexpected error:', err)
+      toast.error('Something went wrong')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   async function handleDelete() {
     if (deleteConfirm !== currentOrg.name) return toast.error('Workspace name does not match')
@@ -39,7 +93,6 @@ export default function SettingsPage() {
     toast.success('Workspace deleted')
     navigate('/dashboard')
   }
-
   return (
     <div className="max-w-lg mx-auto space-y-6">
       <div>
@@ -48,6 +101,27 @@ export default function SettingsPage() {
       </div>
 
       <div className="card p-5 space-y-4">
+        <div className="flex items-center gap-4">
+          <Avatar name={currentOrg?.name} src={currentOrg?.avatar_url} size={56} />
+          <div>
+            <button
+              type="button"
+              className="btn-outline text-sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+            >
+              {uploading ? 'Uploading...' : 'Change picture'}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleAvatarUpload}
+            />
+          </div>
+        </div>
+
         <div>
           <label className="label block mb-1.5">Workspace name</label>
           <input value={name} onChange={e => setName(e.target.value)} />
@@ -61,7 +135,6 @@ export default function SettingsPage() {
           {loading ? 'Saving...' : 'Save changes'}
         </button>
       </div>
-
       {myRole === 'owner' && (
         <div className="card p-5 space-y-3" style={{ borderColor: '#fca5a5' }}>
           <h2 className="section-title text-sm text-red-600">Danger zone</h2>
