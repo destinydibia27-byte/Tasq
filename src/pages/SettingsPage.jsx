@@ -110,7 +110,7 @@ export default function SettingsPage() {
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
             >
-              {uploading ? 'Uploading...' : 'Change picture'}
+              {uploading ? 'Uploading...' : 'Change profile'}
             </button>
             <input
               ref={fileInputRef}
