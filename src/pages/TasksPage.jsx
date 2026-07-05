@@ -6,7 +6,7 @@ import { TaskCard } from '../components/tasks/TaskCard'
 import { TaskDetailModal } from '../components/tasks/TaskDetailModal'
 import { CreateTaskModal } from '../components/tasks/CreateTaskModal'
 import { EmptyState } from '../components/ui/EmptyState'
-import { Plus, Filter, LayoutGrid, List } from 'lucide-react'
+import { Plus, Filter, LayoutGrid, List, Search } from 'lucide-react'
 
 const STATUSES = ['all', 'assigned', 'in_progress', 'submitted', 'approved', 'rejected']
 
@@ -18,6 +18,7 @@ export default function TasksPage() {
   const [createOpen, setCreateOpen] = useState(false)
   const [filter, setFilter] = useState('all')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
+  const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -51,9 +52,14 @@ export default function TasksPage() {
     if (filter !== 'all' && t.status !== filter) return false
     if (assigneeFilter === 'me' && t.assigned_to !== profile?.id) return false
     if (assigneeFilter !== 'all' && assigneeFilter !== 'me' && t.assigned_to !== assigneeFilter) return false
+    if (search.trim()) {
+      const q = search.trim().toLowerCase()
+      const matchesTitle = t.title?.toLowerCase().includes(q)
+      const matchesDesc = t.description?.toLowerCase().includes(q)
+      if (!matchesTitle && !matchesDesc) return false
+    }
     return true
   })
-
   const grouped = {
     assigned: filtered.filter(t => t.status === 'assigned'),
     in_progress: filtered.filter(t => t.status === 'in_progress'),
@@ -86,6 +92,15 @@ export default function TasksPage() {
 
       {/* Filters */}
       <div className="flex items-center gap-2 flex-wrap">
+        <div className="relative" style={{ flex: '1 1 200px', maxWidth: 260 }}>
+          <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-3)' }} />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search tasks..."
+            style={{ paddingLeft: 30, width: '100%' }}
+          />
+        </div>
         <div className="flex gap-1 p-1 rounded-lg" style={{ background: 'var(--surface-2)' }}>
           {STATUSES.map(s => (
             <button
@@ -115,7 +130,6 @@ export default function TasksPage() {
           ))}
         </select>
       </div>
-
       {/* Kanban board */}
       {filter === 'all' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
