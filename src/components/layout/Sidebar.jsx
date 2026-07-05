@@ -41,9 +41,7 @@ export function Sidebar({ mobileOpen, setMobileOpen }) {
           style={{ background: 'var(--surface-2)' }}
           onClick={() => setOrgDropdown(!orgDropdown)}
         >
-          <div className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold text-white" style={{ background: 'var(--accent)', minWidth: 24 }}>
-            {currentOrg?.name?.[0] || '?'}
-          </div>
+          <Avatar name={currentOrg?.name} src={currentOrg?.avatar_url} size={24} />
           <span className="text-sm font-medium flex-1 truncate">{currentOrg?.name || 'No workspace'}</span>
           <ChevronDown size={14} style={{ color: 'var(--text-3)' }} />
         </div>
