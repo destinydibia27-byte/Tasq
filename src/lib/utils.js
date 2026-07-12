@@ -46,6 +46,7 @@ export function formatDeadline(date, status) {
 
   if (status === 'approved') return { text: 'Approved', overdue: false, approved: true }
   if (status === 'submitted') return { text: 'Submitted', overdue: false, submitted: true }
+  if (status === 'rejected') return { text: 'Needs revision', overdue: false, rejected: true }
 
   if (days < 0) return { text: `${Math.abs(days)}d overdue`, overdue: true }
   if (days === 0) return { text: 'Due today', urgent: true }

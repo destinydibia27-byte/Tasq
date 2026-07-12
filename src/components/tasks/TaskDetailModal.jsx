@@ -237,7 +237,7 @@ export function TaskDetailModal({ task, open, onClose, onUpdate }) {
               </div>
             )}
             {priority && <span className={`font-medium ${priority.color}`}>{priority.label} priority</span>}
-            {dl && <span className={dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : dl.approved ? 'text-emerald-500' : dl.submitted ? 'text-blue-400' : ''}>{dl.text}</span>}
+            {dl && <span className={dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : dl.approved ? 'text-emerald-500' : dl.submitted ? 'text-blue-400' : dl.rejected ? 'text-amber-500' : ''}>{dl.text}</span>}
             {task.deadline && <span>Due {format(new Date(task.deadline), 'MMM d, yyyy · h:mm a')}</span>}
           </div>
         </div>

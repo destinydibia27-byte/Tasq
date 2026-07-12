@@ -1,0 +1,38 @@
+diff --git a/src/components/tasks/TaskCard.jsx b/src/components/tasks/TaskCard.jsx
+index 046fc32..29263f6 100644
+--- a/src/components/tasks/TaskCard.jsx
++++ b/src/components/tasks/TaskCard.jsx
+@@ -36,7 +36,7 @@ export function TaskCard({ task, onClick }) {
+         </div>
+ 
+         {dl && (
+-          <div className={`flex items-center gap-1 text-xs ${dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : dl.approved ? 'text-emerald-500' : dl.submitted ? 'text-blue-400' : ''}`} style={!dl.overdue && !dl.urgent && !dl.approved && !dl.submitted ? { color: 'var(--text-3)' } : {}}>
++          <div className={`flex items-center gap-1 text-xs ${dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : dl.approved ? 'text-emerald-500' : dl.submitted ? 'text-blue-400' : dl.rejected ? 'text-amber-500' : ''}`} style={!dl.overdue && !dl.urgent && !dl.approved && !dl.submitted && !dl.rejected ? { color: 'var(--text-3)' } : {}}>
+             <Calendar size={11} />
+             {dl.text}
+           </div>
+diff --git a/src/components/tasks/TaskDetailModal.jsx b/src/components/tasks/TaskDetailModal.jsx
+index 331b6f3..5dbfcf0 100644
+--- a/src/components/tasks/TaskDetailModal.jsx
++++ b/src/components/tasks/TaskDetailModal.jsx
+@@ -237,7 +237,7 @@ export function TaskDetailModal({ task, open, onClose, onUpdate }) {
+               </div>
+             )}
+             {priority && <span className={`font-medium ${priority.color}`}>{priority.label} priority</span>}
+-            {dl && <span className={dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : dl.approved ? 'text-emerald-500' : dl.submitted ? 'text-blue-400' : ''}>{dl.text}</span>}
++            {dl && <span className={dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : dl.approved ? 'text-emerald-500' : dl.submitted ? 'text-blue-400' : dl.rejected ? 'text-amber-500' : ''}>{dl.text}</span>}
+             {task.deadline && <span>Due {format(new Date(task.deadline), 'MMM d, yyyy · h:mm a')}</span>}
+           </div>
+         </div>
+diff --git a/src/lib/utils.js b/src/lib/utils.js
+index 1562e77..da8d507 100644
+--- a/src/lib/utils.js
++++ b/src/lib/utils.js
+@@ -46,6 +46,7 @@ export function formatDeadline(date, status) {
+ 
+   if (status === 'approved') return { text: 'Approved', overdue: false, approved: true }
+   if (status === 'submitted') return { text: 'Submitted', overdue: false, submitted: true }
++  if (status === 'rejected') return { text: 'Needs revision', overdue: false, rejected: true }
+ 
+   if (days < 0) return { text: `${Math.abs(days)}d overdue`, overdue: true }
+   if (days === 0) return { text: 'Due today', urgent: true }
