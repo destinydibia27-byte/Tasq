@@ -1,0 +1,66 @@
+diff --git a/src/components/tasks/TaskCard.jsx b/src/components/tasks/TaskCard.jsx
+index 80f45d6..046fc32 100644
+--- a/src/components/tasks/TaskCard.jsx
++++ b/src/components/tasks/TaskCard.jsx
+@@ -5,7 +5,7 @@ import { formatDeadline, PRIORITY_CONFIG } from '../../lib/utils'
+ import { format } from 'date-fns'
+ 
+ export function TaskCard({ task, onClick }) {
+-  const dl = task.deadline ? formatDeadline(task.deadline) : null
++  const dl = task.deadline ? formatDeadline(task.deadline, task.status) : null
+   const priority = PRIORITY_CONFIG[task.priority]
+   const assignee = task.profiles
+ 
+@@ -36,7 +36,7 @@ export function TaskCard({ task, onClick }) {
+         </div>
+ 
+         {dl && (
+-          <div className={`flex items-center gap-1 text-xs ${dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : ''}`} style={!dl.overdue && !dl.urgent ? { color: 'var(--text-3)' } : {}}>
++          <div className={`flex items-center gap-1 text-xs ${dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : dl.approved ? 'text-emerald-500' : dl.submitted ? 'text-blue-400' : ''}`} style={!dl.overdue && !dl.urgent && !dl.approved && !dl.submitted ? { color: 'var(--text-3)' } : {}}>
+             <Calendar size={11} />
+             {dl.text}
+           </div>
+diff --git a/src/components/tasks/TaskDetailModal.jsx b/src/components/tasks/TaskDetailModal.jsx
+index 69ba057..331b6f3 100644
+--- a/src/components/tasks/TaskDetailModal.jsx
++++ b/src/components/tasks/TaskDetailModal.jsx
+@@ -216,7 +216,7 @@ export function TaskDetailModal({ task, open, onClose, onUpdate }) {
+   }
+ 
+   if (!task) return null
+-  const dl = task.deadline ? formatDeadline(task.deadline) : null
++  const dl = task.deadline ? formatDeadline(task.deadline, task.status) : null
+   const priority = PRIORITY_CONFIG[task.priority]
+ 
+   return (
+@@ -237,7 +237,7 @@ export function TaskDetailModal({ task, open, onClose, onUpdate }) {
+               </div>
+             )}
+             {priority && <span className={`font-medium ${priority.color}`}>{priority.label} priority</span>}
+-            {dl && <span className={dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : ''}>{dl.text}</span>}
++            {dl && <span className={dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : dl.approved ? 'text-emerald-500' : dl.submitted ? 'text-blue-400' : ''}>{dl.text}</span>}
+             {task.deadline && <span>Due {format(new Date(task.deadline), 'MMM d, yyyy · h:mm a')}</span>}
+           </div>
+         </div>
+diff --git a/src/lib/utils.js b/src/lib/utils.js
+index 3777c02..1562e77 100644
+--- a/src/lib/utils.js
++++ b/src/lib/utils.js
+@@ -37,12 +37,16 @@ export function getInitials(name) {
+   return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+ }
+ 
+-export function formatDeadline(date) {
++export function formatDeadline(date, status) {
+   if (!date) return null
+   const d = new Date(date)
+   const now = new Date()
+   const diff = d - now
+   const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
++
++  if (status === 'approved') return { text: 'Approved', overdue: false, approved: true }
++  if (status === 'submitted') return { text: 'Submitted', overdue: false, submitted: true }
++
+   if (days < 0) return { text: `${Math.abs(days)}d overdue`, overdue: true }
+   if (days === 0) return { text: 'Due today', urgent: true }
+   if (days === 1) return { text: 'Due tomorrow', urgent: true }

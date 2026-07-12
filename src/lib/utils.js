@@ -37,12 +37,16 @@ export function getInitials(name) {
   return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
 }
 
-export function formatDeadline(date) {
+export function formatDeadline(date, status) {
   if (!date) return null
   const d = new Date(date)
   const now = new Date()
   const diff = d - now
   const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
+
+  if (status === 'approved') return { text: 'Approved', overdue: false, approved: true }
+  if (status === 'submitted') return { text: 'Submitted', overdue: false, submitted: true }
+
   if (days < 0) return { text: `${Math.abs(days)}d overdue`, overdue: true }
   if (days === 0) return { text: 'Due today', urgent: true }
   if (days === 1) return { text: 'Due tomorrow', urgent: true }

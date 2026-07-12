@@ -5,7 +5,7 @@ import { formatDeadline, PRIORITY_CONFIG } from '../../lib/utils'
 import { format } from 'date-fns'
 
 export function TaskCard({ task, onClick }) {
-  const dl = task.deadline ? formatDeadline(task.deadline) : null
+  const dl = task.deadline ? formatDeadline(task.deadline, task.status) : null
   const priority = PRIORITY_CONFIG[task.priority]
   const assignee = task.profiles
 
@@ -36,7 +36,7 @@ export function TaskCard({ task, onClick }) {
         </div>
 
         {dl && (
-          <div className={`flex items-center gap-1 text-xs ${dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : ''}`} style={!dl.overdue && !dl.urgent ? { color: 'var(--text-3)' } : {}}>
+          <div className={`flex items-center gap-1 text-xs ${dl.overdue ? 'text-red-500' : dl.urgent ? 'text-orange-500' : dl.approved ? 'text-emerald-500' : dl.submitted ? 'text-blue-400' : ''}`} style={!dl.overdue && !dl.urgent && !dl.approved && !dl.submitted ? { color: 'var(--text-3)' } : {}}>
             <Calendar size={11} />
             {dl.text}
           </div>
