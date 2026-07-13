@@ -100,6 +100,32 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
+
+      {/* Push notifications */}
+      <div className="card p-6">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            {pushEnabled ? <Bell size={18} /> : <BellOff size={18} style={{ color: 'var(--text-2)' }} />}
+            <div>
+              <p className="font-semibold text-sm">Push notifications</p>
+              <p className="text-xs" style={{ color: 'var(--text-2)' }}>
+                {pushSupported
+                  ? 'Get notified on this device, even when Tasq is closed.'
+                  : 'Not supported in this browser.'}
+              </p>
+            </div>
+          </div>
+          {pushSupported && (
+            <button
+              className={pushEnabled ? 'btn-outline' : 'btn-primary'}
+              onClick={handleTogglePush}
+              disabled={pushLoading}
+            >
+              {pushLoading ? '...' : pushEnabled ? 'Turn off' : 'Turn on'}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
