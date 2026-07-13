@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Avatar } from '../components/ui/Avatar'
 import { SKILLS, getSkill } from '../lib/utils'
-import { Save, GitBranch, Globe } from 'lucide-react'
+import { Save, GitBranch, Globe, Bell, BellOff } from 'lucide-react'
+import { isPushSupported, subscribeToPush, unsubscribeFromPush } from '../lib/push'
 import toast from 'react-hot-toast'
 
 export default function ProfilePage() {
@@ -13,6 +14,38 @@ export default function ProfilePage() {
   const [githubUrl, setGithubUrl] = useState(profile?.github_url || '')
   const [portfolioUrl, setPortfolioUrl] = useState(profile?.portfolio_url || '')
   const [loading, setLoading] = useState(false)
+  const [pushEnabled, setPushEnabled] = useState(false)
+  const [pushSupported, setPushSupported] = useState(true)
+  const [pushLoading, setPushLoading] = useState(false)
+
+  useEffect(() => {
+    if (!isPushSupported()) {
+      setPushSupported(false)
+      return
+    }
+    navigator.serviceWorker.getRegistration().then(async (reg) => {
+      const sub = reg ? await reg.pushManager.getSubscription() : null
+      setPushEnabled(!!sub)
+    })
+  }, [])
+
+  async function handleTogglePush() {
+    setPushLoading(true)
+    try {
+      if (pushEnabled) {
+        await unsubscribeFromPush(profile.id)
+        setPushEnabled(false)
+        toast.success('Notifications turned off')
+      } else {
+        await subscribeToPush(profile.id)
+        setPushEnabled(true)
+        toast.success('Notifications turned on')
+      }
+    } catch (err) {
+      toast.error(err.message || 'Could not update notification settings')
+    }
+    setPushLoading(false)
+  }
 
   async function handleSave() {
     setLoading(true)
