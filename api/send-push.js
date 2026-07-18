@@ -1,10 +1,13 @@
 import webpush from 'web-push'
 import { createClient } from '@supabase/supabase-js'
 
+const VAPID_PUBLIC = process.env.VITE_VAPID_PUBLIC_KEY || ''
+const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || ''
+
 webpush.setVapidDetails(
   'mailto:admin@tasq.app',
-  process.env.VITE_VAPID_PUBLIC_KEY,
-  process.env.VAPID_PRIVATE_KEY
+  VAPID_PUBLIC,
+  VAPID_PRIVATE
 )
 
 const supabase = createClient(
@@ -13,6 +16,17 @@ const supabase = createClient(
 )
 
 export default async function handler(req, res) {
+  if (req.method === 'GET' && req.query?.debug === '1') {
+    return res.status(200).json({
+      publicKeyLength: VAPID_PUBLIC.length,
+      publicKeyFirst10: VAPID_PUBLIC.slice(0, 10),
+      publicKeyLast5: VAPID_PUBLIC.slice(-5),
+      privateKeyLength: VAPID_PRIVATE.length,
+      hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      hasSupabaseUrl: !!process.env.VITE_SUPABASE_URL,
+    })
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
