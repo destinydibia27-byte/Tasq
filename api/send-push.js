@@ -48,6 +48,7 @@ export default async function handler(req, res) {
   })
 
   let sent = 0
+  const errors = []
   for (const sub of subs) {
     try {
       await webpush.sendNotification(
@@ -59,11 +60,13 @@ export default async function handler(req, res) {
       )
       sent++
     } catch (err) {
+      console.error('Push send failed:', err.statusCode, err.body || err.message)
+      errors.push({ statusCode: err.statusCode || null, message: err.body || err.message })
       if (err.statusCode === 410 || err.statusCode === 404) {
         await supabase.from('push_subscriptions').delete().eq('id', sub.id)
       }
     }
   }
 
-  return res.status(200).json({ sent })
+  return res.status(200).json({ sent, total: subs.length, errors })
 }
