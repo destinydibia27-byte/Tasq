@@ -17,6 +17,17 @@ const supabase = createClient(
 
 export default async function handler(req, res) {
   if (req.method === 'GET' && req.query?.debug === '1') {
+    const crypto = await import('crypto')
+    let keysMatch = null
+    try {
+      const dBuf = Buffer.from(VAPID_PRIVATE, 'base64url')
+      const ecdh = crypto.createECDH('prime256v1')
+      ecdh.setPrivateKey(dBuf)
+      const derivedPub = ecdh.getPublicKey().toString('base64url')
+      keysMatch = derivedPub === VAPID_PUBLIC
+    } catch (e) {
+      keysMatch = `ERROR: ${e.message}`
+    }
     return res.status(200).json({
       publicKeyLength: VAPID_PUBLIC.length,
       publicKeyFirst10: VAPID_PUBLIC.slice(0, 10),
@@ -24,6 +35,7 @@ export default async function handler(req, res) {
       privateKeyLength: VAPID_PRIVATE.length,
       hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
       hasSupabaseUrl: !!process.env.VITE_SUPABASE_URL,
+      keysMatch,
     })
   }
 
